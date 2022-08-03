@@ -1,5 +1,4 @@
 #include "PrefixTree.h"
-#include <algorithm>
 
 PrefixTree::TreeElem::TreeElem(const wchar_t& symbol,TreeElem* parent)
 {
@@ -19,15 +18,22 @@ PrefixTree::PrefixTree()
 
 PrefixTree::~PrefixTree()
 {
-	rRun([](const TreeElem* el)->void{
-		delete el;
+	rRun([](Iter el)->void{
+		delete *el;
 	});
 }
 
-void PrefixTree::rRun(std::function<void(const TreeElem* elem)> func)
+void PrefixTree::rRun(std::function<void(Iter elem)> func)
 {
-	TreeElem* it = root;
-	while (root->run_of_child != root->childs.size()) {
+	this->rRun(Iter(this->root), [&func](PrefixTree::Iter el)->void {
+		func(el);
+	});
+}
+
+void PrefixTree::rRun(Iter start, std::function<void(Iter elem)> func)
+{
+	TreeElem* it = *start;
+	while ((*start)->run_of_child != (*start)->childs.size()) {
 		if (!it->childs.empty() && it->run_of_child < it->childs.size()) {
 			it = it->childs[it->run_of_child];
 		}
@@ -36,10 +42,10 @@ void PrefixTree::rRun(std::function<void(const TreeElem* elem)> func)
 			it->run_of_child = 0;
 			it = it->parent;
 			++it->run_of_child;
-			func(temp);
+			func(PrefixTree::Iter(temp));
 		}
 	}
-	root->run_of_child = 0;
+	(*start)->run_of_child = 0;
 }
 
 void PrefixTree::Add(std::wstring str)
@@ -76,13 +82,20 @@ void PrefixTree::Add(std::wstring str)
 	}
 }
 
-void PrefixTree::Run(std::function<void(const TreeElem* elem)> func)
+void PrefixTree::Run(std::function<void(Iter iter)> func)
 {
-	TreeElem* it = root;
-	while (root->run_of_child != root->childs.size()) {
+	this->Run(Iter(this->root), [&func](PrefixTree::Iter el)->void {
+		func(el);
+	});
+}
+
+void PrefixTree::Run(Iter start,std::function<void(Iter elem)> func)
+{
+	TreeElem* it = *start;
+	while ((*start)->run_of_child < (*start)->childs.size()) {
 		if (!it->childs.empty() && it->run_of_child < it->childs.size()) {
 			it = it->childs[it->run_of_child];
-			func(it);
+			func(PrefixTree::Iter(it));
 		}
 		else {
 			it->run_of_child = 0;
@@ -90,7 +103,7 @@ void PrefixTree::Run(std::function<void(const TreeElem* elem)> func)
 			++it->run_of_child;
 		}
 	}
-	root->run_of_child = 0;
+	(*start)->run_of_child = 0;
 }
 
 bool PrefixTree::Delete(std::wstring str) {
@@ -119,4 +132,49 @@ bool PrefixTree::Delete(std::wstring str) {
 		} while (it->childs.empty() && !it->finaly);
 	}
 	return true;
+}
+
+bool PrefixTree::Search(const std::wstring& str)
+{
+	return false;
+}
+
+PrefixTree::Iter PrefixTree::getRoot()
+{
+	return Iter(this->root);
+}
+
+PrefixTree::Iter::Iter(TreeElem* elem)
+{
+	this->elem = elem;
+}
+
+PrefixTree::Iter::Iter()
+{
+
+}
+
+PrefixTree::Iter PrefixTree::Iter::goToParent()
+{
+	if (!elem->parent) return Iter();
+	elem = elem->parent;
+	return Iter(elem);
+}
+
+PrefixTree::Iter PrefixTree::Iter::goToChild(uint64_t index)
+{
+	if (elem->childs.size() <= index || elem->childs.empty()) return Iter();
+	elem = elem->childs[index];
+	return Iter(elem);
+}
+
+bool PrefixTree::Iter::isEmpty()
+{
+	if (!this->elem) return true;
+	return false;
+}
+
+PrefixTree::TreeElem* PrefixTree::Iter::operator*()
+{
+	return this->elem;
 }
