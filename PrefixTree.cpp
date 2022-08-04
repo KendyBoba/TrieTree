@@ -1,5 +1,7 @@
 #include "PrefixTree.h"
 
+wchar_t* emptyf(wchar_t* str);
+
 PrefixTree::TreeElem::TreeElem(const wchar_t& symbol,TreeElem* parent)
 {
 	this->symbol = symbol;
@@ -156,14 +158,17 @@ bool PrefixTree::Delete(std::wstring str) {
 	return true;
 }
 
-std::vector<std::wstring>& PrefixTree::Search(const std::wstring& str)
+std::vector<std::pair<std::wstring, double>>& PrefixTree::Search(const std::wstring& str, bool isLower)
 {
-	std::vector<std::wstring>* res = new std::vector<std::wstring>();
+	wchar_t* (*lower)(wchar_t*) = emptyf;
+	if (isLower)
+		lower = _wcslwr;
+	std::vector<std::pair<std::wstring,double>>* res = new std::vector<std::pair<std::wstring, double>>();
 	std::wstring prefix;
 	TreeElem* it = root;
 	for (const wchar_t& el : str) {
-		auto find_el = std::find_if(it->childs.begin(), it->childs.end(), [&el](const TreeElem* elem)->bool {
-			if (elem->symbol == el) return true;
+		auto find_el = std::find_if(it->childs.begin(), it->childs.end(), [&el,lower](const TreeElem* elem)->bool {
+			if (*lower((wchar_t*)&elem->symbol) == *lower((wchar_t*)&el)) return true;
 			return false;
 		});
 		if (find_el != it->childs.end()) {
@@ -174,17 +179,25 @@ std::vector<std::wstring>& PrefixTree::Search(const std::wstring& str)
 			return *res;
 		}
 	}
+	if (it->finaly) {
+		it->weight += 0.1;
+		res->push_back(std::make_pair(prefix, it->weight));
+	}
 	std::wstring new_string;
-	specRun(Iter(it), [&new_string,&it,&res,&prefix](Iter iter)->void {
+	specRun(Iter(it), [&new_string, &it, &res, &prefix](Iter iter)->void {
 		if (iter.isEmpty()) {
 			new_string.pop_back();
 		}
 		else {
 			new_string += (*iter)->symbol;
 			if ((*iter)->finaly) {
-				res->push_back(prefix + new_string);
+				(*iter)->weight += 0.1;
+				res->push_back(std::make_pair(prefix + new_string, (*iter)->weight));
 			}
 		}
+	});
+	std::sort(res->begin(), res->end(), [](const std::pair<std::wstring,double> &el1, const std::pair<std::wstring, double>& el2)->bool {
+		return (el2.second - el1.second) < (- std::numeric_limits<double>::epsilon());
 	});
 	return *res;
 }

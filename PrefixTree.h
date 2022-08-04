@@ -5,6 +5,9 @@
 #include <algorithm>
 #include <exception>
 #include <stdexcept>
+#include <cmath>
+#include <utility>
+
 class PrefixTree {
 public:
 	class TreeElem {
@@ -14,6 +17,7 @@ public:
 		wchar_t symbol = L'\0';
 		uint64_t run_of_child = 0;
 		bool finaly = false;
+		double weight = 0;
 		TreeElem(const wchar_t& symbol,TreeElem * parent = nullptr);
 		TreeElem();
 	};
@@ -42,6 +46,6 @@ public:
 	void rRun(Iter start, std::function<void(Iter elem)>func);
 	void Add(std::wstring str);
 	bool Delete(std::wstring str);
-	std::vector<std::wstring>& Search(const std::wstring& str);
+	std::vector<std::pair<std::wstring, double>>& Search(const std::wstring& str,bool isLower = true);
 	Iter getRoot();
 };
