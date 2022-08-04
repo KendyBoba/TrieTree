@@ -7,6 +7,7 @@
 #include <stdexcept>
 #include <cmath>
 #include <utility>
+#include <initializer_list>
 
 class PrefixTree {
 public:
@@ -39,13 +40,15 @@ private:
 	void specRun(Iter start, std::function<void(Iter elem)>func);
 public:
 	PrefixTree();
+	PrefixTree(const std::initializer_list<std::wstring> &init_list);
 	~PrefixTree();
 	void Run(std::function<void(Iter elem)>func);
 	void Run(Iter start,std::function<void(Iter elem)>func);
 	void rRun(std::function<void(Iter elem)>func);
 	void rRun(Iter start, std::function<void(Iter elem)>func);
 	void Add(std::wstring str);
-	bool Delete(std::wstring str);
+	bool Delete(std::wstring str,bool isLower = true);
 	std::vector<std::pair<std::wstring, double>>& Search(const std::wstring& str,bool isLower = true);
 	Iter getRoot();
+	void Clear();
 };

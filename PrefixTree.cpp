@@ -37,11 +37,17 @@ PrefixTree::PrefixTree()
 	root = new TreeElem;
 }
 
+PrefixTree::PrefixTree(const std::initializer_list<std::wstring> &init_list) : PrefixTree()
+{
+	for (auto el : init_list) {
+		this->Add(el);
+	}
+}
+
 PrefixTree::~PrefixTree()
 {
-	rRun([](Iter el)->void{
-		delete *el;
-	});
+	Clear();
+	delete root;
 }
 
 void PrefixTree::rRun(std::function<void(Iter elem)> func)
@@ -129,12 +135,16 @@ void PrefixTree::Run(Iter start,std::function<void(Iter elem)> func)
 	(*start)->run_of_child = 0;
 }
 
-bool PrefixTree::Delete(std::wstring str) {
+bool PrefixTree::Delete(std::wstring str, bool isLower) {
 	if (str.empty()) return false;
+
+	wchar_t* (*lower)(wchar_t*) = emptyf;
+	if(isLower)
+		lower = _wcslwr;
 	TreeElem* it = root;
 	for (int i = 0; i < str.length(); ++i) {
-		auto el = std::find_if(it->childs.begin(), it->childs.end(), [&str, i](const TreeElem* elem)->bool {
-			if (elem->symbol == str[i]) return true;
+		auto el = std::find_if(it->childs.begin(), it->childs.end(), [&str, i,lower](const TreeElem* elem)->bool {
+			if (*lower((wchar_t*)&elem->symbol) == *lower(&str[i])) return true;
 			return false;
 		});
 		if (el != it->childs.end()) {
@@ -205,6 +215,15 @@ std::vector<std::pair<std::wstring, double>>& PrefixTree::Search(const std::wstr
 PrefixTree::Iter PrefixTree::getRoot()
 {
 	return Iter(this->root);
+}
+
+void PrefixTree::Clear()
+{
+	rRun([](Iter el)->void {
+		(*el)->childs.clear();
+		delete* el;
+	});
+	root->childs.clear();
 }
 
 PrefixTree::Iter::Iter(TreeElem* elem)
