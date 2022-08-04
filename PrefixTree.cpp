@@ -11,6 +11,25 @@ PrefixTree::TreeElem::TreeElem()
 
 }
 
+void PrefixTree::specRun(Iter start, std::function<void(Iter elem)> func)
+{
+	if (start.isEmpty()) throw std::invalid_argument("start element is empty");
+	TreeElem* it = *start;
+	while ((*start)->run_of_child != (*start)->childs.size()) {
+		if (!it->childs.empty() && it->run_of_child < it->childs.size()) {
+			it = it->childs[it->run_of_child];
+			func(PrefixTree::Iter(it));
+		}
+		else {
+			it->run_of_child = 0;
+			it = it->parent;
+			++it->run_of_child;
+			func(Iter(nullptr));
+		}
+	}
+	(*start)->run_of_child = 0;
+}
+
 PrefixTree::PrefixTree()
 {
 	root = new TreeElem;
@@ -137,9 +156,37 @@ bool PrefixTree::Delete(std::wstring str) {
 	return true;
 }
 
-bool PrefixTree::Search(const std::wstring& str)
+std::vector<std::wstring>& PrefixTree::Search(const std::wstring& str)
 {
-	return false;
+	std::vector<std::wstring>* res = new std::vector<std::wstring>();
+	std::wstring prefix;
+	TreeElem* it = root;
+	for (const wchar_t& el : str) {
+		auto find_el = std::find_if(it->childs.begin(), it->childs.end(), [&el](const TreeElem* elem)->bool {
+			if (elem->symbol == el) return true;
+			return false;
+		});
+		if (find_el != it->childs.end()) {
+			prefix.push_back((*find_el)->symbol);
+			it = *find_el;
+		}
+		else {
+			return *res;
+		}
+	}
+	std::wstring new_string;
+	specRun(Iter(it), [&new_string,&it,&res,&prefix](Iter iter)->void {
+		if (iter.isEmpty()) {
+			new_string.pop_back();
+		}
+		else {
+			new_string += (*iter)->symbol;
+			if ((*iter)->finaly) {
+				res->push_back(prefix + new_string);
+			}
+		}
+	});
+	return *res;
 }
 
 PrefixTree::Iter PrefixTree::getRoot()

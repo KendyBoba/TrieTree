@@ -31,6 +31,8 @@ public:
 private:
 	TreeElem* root = nullptr;
 	uint16_t word_count = 0;
+private:
+	void specRun(Iter start, std::function<void(Iter elem)>func);
 public:
 	PrefixTree();
 	~PrefixTree();
@@ -40,6 +42,6 @@ public:
 	void rRun(Iter start, std::function<void(Iter elem)>func);
 	void Add(std::wstring str);
 	bool Delete(std::wstring str);
-	bool Search(const std::wstring& str);
+	std::vector<std::wstring>& Search(const std::wstring& str);
 	Iter getRoot();
 };
