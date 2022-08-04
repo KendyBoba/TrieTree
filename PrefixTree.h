@@ -3,6 +3,8 @@
 #include <vector>
 #include <functional>
 #include <algorithm>
+#include <exception>
+#include <stdexcept>
 class PrefixTree {
 public:
 	class TreeElem {
@@ -21,7 +23,6 @@ public:
 		TreeElem* elem = nullptr;
 	public:
 		Iter(TreeElem* elem);
-		Iter();
 		Iter goToParent();
 		Iter goToChild(uint64_t index);
 		bool isEmpty();

@@ -32,6 +32,7 @@ void PrefixTree::rRun(std::function<void(Iter elem)> func)
 
 void PrefixTree::rRun(Iter start, std::function<void(Iter elem)> func)
 {
+	if (start.isEmpty()) throw std::invalid_argument("start element is empty");
 	TreeElem* it = *start;
 	while ((*start)->run_of_child != (*start)->childs.size()) {
 		if (!it->childs.empty() && it->run_of_child < it->childs.size()) {
@@ -91,6 +92,7 @@ void PrefixTree::Run(std::function<void(Iter iter)> func)
 
 void PrefixTree::Run(Iter start,std::function<void(Iter elem)> func)
 {
+	if (start.isEmpty()) throw std::invalid_argument("start element is empty");
 	TreeElem* it = *start;
 	while ((*start)->run_of_child < (*start)->childs.size()) {
 		if (!it->childs.empty() && it->run_of_child < it->childs.size()) {
@@ -107,6 +109,7 @@ void PrefixTree::Run(Iter start,std::function<void(Iter elem)> func)
 }
 
 bool PrefixTree::Delete(std::wstring str) {
+	if (str.empty()) return false;
 	TreeElem* it = root;
 	for (int i = 0; i < str.length(); ++i) {
 		auto el = std::find_if(it->childs.begin(), it->childs.end(), [&str, i](const TreeElem* elem)->bool {
@@ -149,21 +152,17 @@ PrefixTree::Iter::Iter(TreeElem* elem)
 	this->elem = elem;
 }
 
-PrefixTree::Iter::Iter()
-{
-
-}
 
 PrefixTree::Iter PrefixTree::Iter::goToParent()
 {
-	if (!elem->parent) return Iter();
+	if (!elem->parent) throw std::domain_error("parent is nullptr");
 	elem = elem->parent;
 	return Iter(elem);
 }
 
 PrefixTree::Iter PrefixTree::Iter::goToChild(uint64_t index)
 {
-	if (elem->childs.size() <= index || elem->childs.empty()) return Iter();
+	if (elem->childs.size() <= index) throw std::out_of_range("index > size");
 	elem = elem->childs[index];
 	return Iter(elem);
 }
@@ -176,5 +175,6 @@ bool PrefixTree::Iter::isEmpty()
 
 PrefixTree::TreeElem* PrefixTree::Iter::operator*()
 {
+	if (!this->elem) throw std::domain_error("element of Iter is nullptr");
 	return this->elem;
 }
