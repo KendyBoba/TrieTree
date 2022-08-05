@@ -144,7 +144,9 @@ bool PrefixTree::Delete(std::wstring str, bool isLower) {
 	TreeElem* it = root;
 	for (int i = 0; i < str.length(); ++i) {
 		auto el = std::find_if(it->childs.begin(), it->childs.end(), [&str, i,lower](const TreeElem* elem)->bool {
-			if (*lower((wchar_t*)&elem->symbol) == *lower(&str[i])) return true;
+			wchar_t ch1 = elem->symbol;
+			wchar_t ch2 = str[i];
+			if (*lower((wchar_t*)&ch1) == *lower(&ch2)) return true;
 			return false;
 		});
 		if (el != it->childs.end()) {
@@ -178,7 +180,9 @@ std::vector<std::pair<std::wstring, double>>& PrefixTree::Search(const std::wstr
 	TreeElem* it = root;
 	for (const wchar_t& el : str) {
 		auto find_el = std::find_if(it->childs.begin(), it->childs.end(), [&el,lower](const TreeElem* elem)->bool {
-			if (*lower((wchar_t*)&elem->symbol) == *lower((wchar_t*)&el)) return true;
+			wchar_t ch1 = elem->symbol;
+			wchar_t ch2 = el;
+			if (*lower((wchar_t*)&ch1) == *lower((wchar_t*)&ch2)) return true;
 			return false;
 		});
 		if (find_el != it->childs.end()) {
