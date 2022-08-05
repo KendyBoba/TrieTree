@@ -221,6 +221,11 @@ PrefixTree::Iter PrefixTree::getRoot()
 	return Iter(this->root);
 }
 
+uint16_t PrefixTree::getCountWords()
+{
+	return word_count;
+}
+
 void PrefixTree::Clear()
 {
 	rRun([](Iter el)->void {

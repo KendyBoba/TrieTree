@@ -50,5 +50,6 @@ public:
 	bool Delete(std::wstring str,bool isLower = true);
 	std::vector<std::pair<std::wstring, double>>& Search(const std::wstring& str,bool isLower = true);
 	Iter getRoot();
+	uint16_t getCountWords();
 	void Clear();
 };
