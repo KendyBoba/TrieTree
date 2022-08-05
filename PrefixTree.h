@@ -46,7 +46,7 @@ public:
 	void Run(Iter start,std::function<void(Iter elem)>func);
 	void rRun(std::function<void(Iter elem)>func);
 	void rRun(Iter start, std::function<void(Iter elem)>func);
-	void Add(std::wstring str);
+	void Add(std::wstring str,bool isLower = true);
 	bool Delete(std::wstring str,bool isLower = true);
 	std::vector<std::pair<std::wstring, double>>& Search(const std::wstring& str,bool isLower = true);
 	Iter getRoot();

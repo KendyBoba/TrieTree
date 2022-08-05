@@ -76,9 +76,11 @@ void PrefixTree::rRun(Iter start, std::function<void(Iter elem)> func)
 	(*start)->run_of_child = 0;
 }
 
-void PrefixTree::Add(std::wstring str)
+void PrefixTree::Add(std::wstring str, bool isLower)
 {
 	if (str.empty()) return;
+	if (isLower)
+		_wcslwr((wchar_t*)str.c_str());
 	word_count++;
 	TreeElem* root = this->root;
 	auto el = std::find_if(root->childs.begin(), root->childs.end(), [&str](const TreeElem* elem)->bool {
