@@ -27,3 +27,5 @@ Iter getRoot()
 uint16_t getCountWords() - возвращает колличество слов в дереве
 
 void Clear()
+
+Release - https://drive.google.com/drive/folders/1KLcLzyhqxJK0zRwCkfVT841MhC6_Zy8s?usp=sharing
